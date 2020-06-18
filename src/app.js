@@ -24,7 +24,7 @@ app.post("/repositories", (request, response) => {
         Certifique-se que o ID seja um UUID, e de sempre iniciar os likes como 0.
    */
   const { title, url, techs } = request.body;
-  const repository = { id: uuid(), title, url, techs };
+  const repository = { id: uuid(), title, url, techs, likes: 0 };
 
   repositories.push(repository);
 
@@ -71,6 +71,21 @@ app.post("/repositories/:id/like", (request, response) => {
   // TODO
   /* A rota deve aumentar o número de likes do repositório específico escolhido através do id presente nos parâmetros da rota, 
   a cada chamada dessa rota, o número de likes deve ser aumentado em 1; */
+
+  const { id } = request.params;
+  const repositoryIndex = repositories.findIndex(
+    (repository) => repository.id === id
+  );
+  const repository = repositories[repositoryIndex];
+
+  if (repositoryIndex < 0) {
+    return response.status(400).json({ error: "Repository not found" });
+  }
+  repository.likes = ++repository.likes;
+
+  repositories[repositoryIndex] = repository;
+
+  return response.status(201).send();
 });
 
 module.exports = app;
